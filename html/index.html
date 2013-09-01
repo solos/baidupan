@@ -1,0 +1,2245 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to baidupan’s documentation! &mdash; baidupan 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="baidupan 0.0.1 documentation" href="#" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="#">baidupan 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="welcome-to-baidupan-s-documentation">
+<h1>Welcome to baidupan&#8217;s documentation!<a class="headerlink" href="#welcome-to-baidupan-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>目录:</p>
+<div class="section" id="id1">
+<h2>空间配额信息<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>获取当前用户空间配额信息。</li>
+</ul>
+</dd>
+<dt>接口地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/quota">https://pcs.baidu.com/rest/2.0/pcs/quota</a></li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>GET</li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>method  string  是  固定值：info。</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>quotauint64 否  空间配额，单位为字节。</li>
+<li>used    uint6   否已使用空间大小，单位为字节。</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>GET https://pcs.baidu.com/rest/2.0/pcs/quota?method=info&amp;access_token=1.54be391000a16ee6a21791d4a8ea04fe.86400.1331206383.67272939-188383</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;quota&quot;</span><span class="p">:</span> <span class="mi">15000000000</span><span class="p">,</span>
+    <span class="s">&quot;used&quot;</span><span class="p">:</span> <span class="mi">5221166</span><span class="p">,</span>
+    <span class="s">&quot;request_id&quot;</span><span class="p">:</span> <span class="mi">4043312634</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">quota</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id2">
+<h2>上传单个文件<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>上传单个文件。 百度PCS服务目前支持最大2G的单个文件上传。 如需支持超大文件（&gt;2G）的断点续传，请参考下面的“分片文件上传”方法。</li>
+</ul>
+</dd>
+<dt>接口地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://c.pcs.baidu.com/rest/2.0/pcs/file">https://c.pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>POST</li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>method  string  是  固定值，upload。</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+<li>path    string  是  上传文件路径（含上传的文件名称)。</li>
+<li>file    char[]  是  上传文件的内容。</li>
+<li>ondup   string  否</li>
+<li>overwrite：表示覆盖同名文件；</li>
+<li>newcopy：表示生成文件副本并进行重命名，命名规则为“文件名_日期.后缀”。</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>上述四个参数中file需通过POST表单进行传递，其他参数则需通过query_string进行传递。</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>path    string  是  该文件的绝对路径。</li>
+<li>size    uint64  否  文件字节大小。</li>
+<li>ctime   uint64  否  文件创建时间。</li>
+<li>mtime   uint64  否  文件修改时间。</li>
+<li>md5 string  否  文件的md5签名。</li>
+<li>fs_id   uint64  否  文件在PCS的临时唯一标识ID。</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>POST https://pcs.baidu.com/rest/2.0/pcs/file?method=upload&amp;path=%2fapps%2falbum%2f1.JPG&amp;access_token=b778fb598c717c0ad7ea8c97c8f3a46f</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;path&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/album/1.jpg&quot;</span><span class="p">,</span>
+    <span class="s">&quot;size&quot;</span><span class="p">:</span> <span class="mi">372121</span><span class="p">,</span>
+    <span class="s">&quot;ctime&quot;</span><span class="p">:</span> <span class="mi">1234567890</span><span class="p">,</span>
+    <span class="s">&quot;mtime&quot;</span><span class="p">:</span> <span class="mi">1234567890</span><span class="p">,</span>
+    <span class="s">&quot;md5&quot;</span><span class="p">:</span> <span class="s">&quot;cb123afcc12453543ef&quot;</span><span class="p">,</span>
+    <span class="s">&quot;fs_id&quot;</span><span class="p">:</span> <span class="mi">12345</span><span class="p">,</span>
+    <span class="s">&quot;request_id&quot;</span><span class="p">:</span> <span class="mi">4043312669</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">upload</span><span class="p">(</span><span class="s">&#39;hello&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s">&#39;/apps/appname/hello.txt&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h2>分片上传—文件分片及上传<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>百度PCS服务支持每次直接上传最大2G的单个文件。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>POST</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://c.pcs.baidu.com/rest/2.0/pcs/file">https://c.pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值，upload。</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+<li>type    string  是  固定值，tmpfile。</li>
+<li>file    char[]  是  上传文件的内容。</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    UrlEncode   描述</li>
+<li>md5 string  否  文件的md5签名。</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：</p>
+<div class="highlight-python"><pre>POST https://pcs.baidu.com/rest/2.0/pcs/file?method=upload&amp;access_token=1.54bef000f2416ee4a41791d4a8ea04fe.86400.1331206383.67272939-188383&amp;type=tmpfile</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;md5&quot;</span><span class="p">:</span><span class="s">&quot;a7619410bca74850f985e488c9a0d51e&quot;</span><span class="p">,</span>
+    <span class="s">&quot;request_id&quot;</span><span class="p">:</span><span class="mi">3238563823</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">upload</span><span class="p">(</span><span class="s">&#39;hello&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s">&#39;/apps/appname/hello.txt&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>分片上传—合并分片文件<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>与分片文件上传的upload方法配合使用，可实现超大文件（&gt;2G）上传，同时也可用于断点续传的场景。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>POST</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/file">https://pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值，createsuperfile。</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+<li>path    string  是  上传文件路径（含上传的文件名称）。</li>
+<li>param   string  是</li>
+</ul>
+</dd>
+<dt>block_list数组，数组的取值为子文件内容的MD5；子文件至少两个，最多1024个。</dt>
+<dd><ul class="first last simple">
+<li>ondup   string  否</li>
+<li>overwrite：表示覆盖同名文件；</li>
+<li>newcopy：表示生成文件副本并进行重命名，命名规则为“文件名_日期.后缀”。</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last">
+<li><p class="first">路径长度限制为1000</p>
+</li>
+<li><p class="first">路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</p>
+</li>
+<li><p class="first">文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</p>
+</li>
+<li><p class="first">本参数必须放在Http Body中进行传输，value示例：:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span><span class="s">&quot;block_list&quot;</span><span class="p">:</span>
+    <span class="p">[</span>
+        <span class="s">&quot;d41d8cd98f00b204e9800998ecf8427e&quot;</span><span class="p">,</span>
+        <span class="s">&quot;89dfb274b42951b973fc92ee7c252166&quot;</span><span class="p">,</span>
+        <span class="s">&quot;1c83fe229cb9b1f6116aa745b4ef3c0d&quot;</span>
+    <span class="p">]}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    UrlEncode   描述</li>
+<li>path    string  是  该文件的绝对路径。</li>
+<li>size    uint64  否  文件大小（以字节为单位）。</li>
+<li>ctime   uint64  否  文件创建时间。</li>
+<li>mtime   uint64  否  文件修改时间。</li>
+<li>md5 string  否  文件的md5签名。</li>
+<li>fs_id   uint64  否  文件在PCS的临时唯一标识ID。</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：</p>
+<div class="highlight-python"><pre>POST https://pcs.baidu.com/rest/2.0/file?method=createsuperfile&amp;path=%2fapps%2fyunform%2f6ddddd.JPG&amp;access_token=1.9fb09e8cce44c0d000e6787138924a26.86400.1331273905.2600617452-188383</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;path&quot;</span><span class="p">:</span><span class="s">&quot;/apps/yunform/6ddddd.JPG&quot;</span><span class="p">,</span>
+    <span class="s">&quot;size&quot;</span><span class="p">:</span><span class="mi">6844</span><span class="p">,</span>
+    <span class="s">&quot;ctime&quot;</span><span class="p">:</span><span class="mi">1331197101</span><span class="p">,</span>
+    <span class="s">&quot;mtime&quot;</span><span class="p">:</span><span class="mi">1331197101</span><span class="p">,</span>
+    <span class="s">&quot;md5&quot;</span><span class="p">:</span><span class="s">&quot;baa7c379639b74e9bf98c807498e1b64&quot;</span><span class="p">,</span>
+    <span class="s">&quot;fs_id&quot;</span><span class="p">:</span><span class="mi">1548308694</span><span class="p">,</span>
+    <span class="s">&quot;request_id&quot;</span><span class="p">:</span><span class="mi">4043313276</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="n">param</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;block_list&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s">&quot;d41d8cd98f00b204e9800998ecf8427e&quot;</span><span class="p">,</span>
+            <span class="s">&quot;89dfb274b42951b973fc92ee7c252166&quot;</span><span class="p">,</span>
+            <span class="s">&quot;1c83fe229cb9b1f6116aa745b4ef3c0d&quot;</span>
+         <span class="p">]}</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="s">&#39;/apps/appname/hello.txt&#39;</span><span class="p">,</span> <span class="n">param</span><span class="o">=</span><span class="n">param</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id5">
+<h2>下载单个文件<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>下载单个文件。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>GET</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://d.pcs.baidu.com/rest/2.0/pcs/file">https://d.pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值，download。</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+<li>path    string  是  下载文件路径，以/开头的绝对路径。</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>Download接口支持HTTP协议标准range定义，通过指定range的取值可以实现断点下载功能：。 例如： 如果在request消息中指定“Range: bytes=0-99”，那么响应消息中会返回该文件的前100个字节的内容；继续指定“Range: bytes=100-199”，那么响应消息中会返回该文件的第二个100字节内容。</li>
+<li>兼容原有域名pcs.baidu.com；使用新域名d.pcs.baidu.com，则提供更快、更稳定的下载服务。</li>
+<li>需注意处理好 302 跳转问题。</li>
+<li>路径长度限制为1000</li>
+<li>路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</li>
+<li>文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>无</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>GET https://pcs.baidu.com/rest/2.0/pcs/file?method=download&amp;access_token=3.d9000194f4b5d2da3fe8b6f850ace082.2592000.1348645419.2233553628-248414&amp;path=%2Fapps%2F%E6%B5%8B%E8%AF%95%E5%BA%94%E7%94%A8%2F%2F01.jpg</pre>
+</div>
+<p>响应示例：</p>
+<blockquote>
+<div><ul class="simple">
+<li>文件内容</li>
+</ul>
+</div></blockquote>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s">&#39;/apps/appname/hello.txt&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id6">
+<h2>创建目录<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>为当前用户创建一个目录。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>POST</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/file">https://pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值，mkdir。</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+<li>path    string  是  需要创建的目录，以/开头的绝对路径。</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>路径长度限制为1000</li>
+<li>路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</li>
+<li>文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    UrlEncode   描述</li>
+<li>fs_id   uint64  否  目录在PCS的临时唯一标识id。</li>
+<li>path    string  否  该目录的绝对路径。</li>
+<li>ctime   uint64  否  目录创建时间。</li>
+<li>mtime   uint64  否  目录修改时间。</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>POST https://pcs.baidu.com/rest/2.0/pcs/file?method=mkdir&amp;access_token=1.54bef000f2416ee4a41791d4a8ea04fe.86400.1331206383.67272939-188383&amp;path=%2Fapps%2Fyunform%2Fmusic</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;fs_id&quot;</span><span class="p">:</span><span class="mi">1636599174</span><span class="p">,</span>
+    <span class="s">&quot;path&quot;</span><span class="p">:</span><span class="s">&quot;/apps/yunfom/music&quot;</span><span class="p">,</span>
+    <span class="s">&quot;ctime&quot;</span><span class="p">:</span><span class="mi">1331183814</span><span class="p">,</span>
+    <span class="s">&quot;mtime&quot;</span><span class="p">:</span><span class="mi">1331183814</span><span class="p">,</span>
+    <span class="s">&quot;request_id&quot;</span><span class="p">:</span><span class="mi">4043312656</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="s">&#39;/apps/appname/dirname&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id7">
+<h2>获取单个文件/目录的元信息<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>获取单个文件或目录的元信息。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>GET</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/file">https://pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值，meta。</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+<li>path    string  是  需要获取文件属性的目录，以/开头的绝对路径。如：/apps/album/a/b/c</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>路径长度限制为1000</li>
+<li>路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</li>
+<li>文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    UrlEncode   描述</li>
+<li>fs_id   uint64  否  文件或目录在PCS的临时唯一标识ID。</li>
+<li>path    string  否  文件或目录的绝对路径。</li>
+<li>ctime   uint    否  文件或目录的创建时间。</li>
+<li>mtime   uint    否  文件或目录的最后修改时间。</li>
+<li>block_list  string  否  文件所有分片的md5数组JSON字符串。</li>
+<li>size    uint64  否  文件大小（byte）。</li>
+<li>isdir   uint    否  是否是目录的标识符： “0”为文件 “1”为目录</li>
+<li>ifhassubdir uint    否  是否含有子目录的标识符： “0”表示没有子目录 “1”表示有子目录</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>GET https://pcs.baidu.com/rest/2.0/pcs/file?method=meta&amp;access_token=1.5400f91df2416ee4a41791d4a8ea04fe.86400.1331206383.67272939-188383&amp;path=%2Fapps%2Fyunform%2Fmusic%2Fhello</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;list&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;fs_id&quot;</span><span class="p">:</span> <span class="mi">3528850315</span><span class="p">,</span>
+            <span class="s">&quot;path&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/yunform/music/hello&quot;</span><span class="p">,</span>
+            <span class="s">&quot;ctime&quot;</span><span class="p">:</span> <span class="mi">1331184269</span><span class="p">,</span>
+            <span class="s">&quot;mtime&quot;</span><span class="p">:</span> <span class="mi">1331184269</span><span class="p">,</span>
+            <span class="s">&quot;block_list&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s">&quot;59ca0efa9f5633cb0371bbc0355478d8&quot;</span>
+            <span class="p">],</span>
+            <span class="s">&quot;size&quot;</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span>
+            <span class="s">&quot;isdir&quot;</span><span class="p">:</span> <span class="mi">1</span>
+        <span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s">&quot;request_id&quot;</span><span class="p">:</span> <span class="mi">4043312678</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">meta</span><span class="p">(</span><span class="s">&#39;/apps/appname/filename&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id8">
+<h2>批量获取文件/目录的元信息<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>批量获取文件或目录的元信息。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>POST</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/file">https://pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值，meta。</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+<li>param   string  是  JSON字符串。{&#8220;list&#8221;:[{&#8220;path&#8221;:&#8221;/apps/album/a/b/c&#8221;},{&#8220;path&#8221;:&#8221;/apps/album/a/b/d&#8221;}]}</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>路径长度限制为1000</li>
+<li>路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</li>
+<li>文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    UrlEncode   描述</li>
+<li>fs_id   uint64  否  文件或目录在PCS的临时唯一标识id。</li>
+<li>path    string  否  文件或目录的绝对路径。</li>
+<li>ctime   uint    否  文件或目录的创建时间。</li>
+<li>mtime   uint    否  文件或目录的修改时间。</li>
+<li>size    uint64  否  文件大小（byte）。</li>
+<li>block_list  string  否  文件所有分片的md5数组json字符串。</li>
+<li>isdir   uint    否  是否是目录的标识符： “0”为文件 “1”为目录</li>
+<li>ifhassubdir uint    否  是否含有子目录的标识符： “0”表示没有子目录 “1”表示有子目录</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>POST https://pcs.baidu.com/rest/2.0/pcs/file?method=meta&amp;access_token=1.54b0091ee2416ee4a41791d4a8ea04fe.86400.1331206383.67272939-188383</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;list&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;fs_id&quot;</span><span class="p">:</span> <span class="mi">3528850315</span><span class="p">,</span>
+            <span class="s">&quot;path&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/album/a/b/c&quot;</span><span class="p">,</span>
+            <span class="s">&quot;ctime&quot;</span><span class="p">:</span> <span class="mi">1331184269</span><span class="p">,</span>
+            <span class="s">&quot;mtime&quot;</span><span class="p">:</span> <span class="mi">1331184269</span><span class="p">,</span>
+            <span class="s">&quot;block_list&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s">&quot;59ca0efa9f5633cb0371bbc0355478d8&quot;</span>
+            <span class="p">],</span>
+            <span class="s">&quot;size&quot;</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span>
+            <span class="s">&quot;isdir&quot;</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s">&quot;fs_id&quot;</span><span class="p">:</span> <span class="mi">3528850320</span><span class="p">,</span>
+            <span class="s">&quot;path&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/album/a/b/d&quot;</span><span class="p">,</span>
+            <span class="s">&quot;ctime&quot;</span><span class="p">:</span> <span class="mi">1331184269</span><span class="p">,</span>
+            <span class="s">&quot;mtime&quot;</span><span class="p">:</span> <span class="mi">1331184269</span><span class="p">,</span>
+            <span class="s">&quot;block_list&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s">&quot;59ca0efa9f5633cb0371bbc0355478d8&quot;</span>
+            <span class="p">],</span>
+            <span class="s">&quot;size&quot;</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span>
+            <span class="s">&quot;isdir&quot;</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s">&quot;request_id&quot;</span><span class="p">:</span> <span class="mi">4043312678</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">mmeta</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&quot;list&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s">&quot;path&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/appname/&quot;</span><span class="p">}]}))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id9">
+<h2>获取目录下的文件列表<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>获取目录下的文件列表。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>GET</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/file">https://pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值，list。</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+<li>path    string  是  需要list的目录，以/开头的绝对路径。</li>
+<li>by  string  否  排序字段，缺省根据文件类型排序：</li>
+<li>time（修改时间）</li>
+<li>name（文件名）</li>
+<li>size（大小，注意目录无大小）</li>
+<li>order   string  否  “asc”或“desc”，缺省采用降序排序。</li>
+<li>asc（升序）</li>
+<li>desc（降序）</li>
+<li>limit   string  否  返回条目控制，参数格式为：n1-n2。 返回结果集的[n1, n2)之间的条目，缺省返回所有条目；n1从0开始。</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>路径长度限制为1000</li>
+<li>路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</li>
+<li>文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    UrlEncode    描述</li>
+<li>fs_id   uint64  否  文件或目录在PCS的临时唯一标识id。</li>
+<li>path    string  否  文件或目录的绝对路径。</li>
+<li>ctime   uint    否  文件或目录的创建时间。</li>
+<li>mtime   uint    否  文件或目录的最后修改时间。</li>
+<li>md5 string  否  文件的md5值。</li>
+<li>size    uint64  否  文件大小（byte）。</li>
+<li>isdir   uint    否  是否是目录的标识符： “0”为文件 “1”为目录</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>GET https://pcs.baidu.com/rest/2.0/pcs/file?method=list&amp;access_token=1.54bef91002416ee4a41791d4a8ea04fe.86400.1331206383.67272939-188383&amp;path=%2Fapps%2Fyunform%2Fhello</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;list&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;fs_id&quot;</span><span class="p">:</span> <span class="mi">3528850315</span><span class="p">,</span>
+            <span class="s">&quot;path&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/yunform/music/hello&quot;</span><span class="p">,</span>
+            <span class="s">&quot;ctime&quot;</span><span class="p">:</span> <span class="mi">1331184269</span><span class="p">,</span>
+            <span class="s">&quot;mtime&quot;</span><span class="p">:</span> <span class="mi">1331184269</span><span class="p">,</span>
+            <span class="s">&quot;block_list&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s">&quot;59ca0efa9f5633cb0371bbc0355478d8&quot;</span>
+            <span class="p">],</span>
+            <span class="s">&quot;size&quot;</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span>
+            <span class="s">&quot;isdir&quot;</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s">&quot;request_id&quot;</span><span class="p">:</span> <span class="mi">4043312670</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="s">&quot;/apps/appname/&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id10">
+<h2>移动单个文件/目录<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>移动单个文件/目录。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>POST</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/file">https://pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值，move。</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+<li>from    string  是  源文件地址（包括文件名）。</li>
+<li>to  string  是  目标文件地址（包括文件名）。</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>如果move操作执行成功，那么response会返回执行成功的from/to列表。</li>
+<li>参数名称    类型    UrlEncode    描述</li>
+<li>from    string  是  执行move操作成功的源文件地址。</li>
+<li>to  string  是  执行move操作成功的目标文件地址。</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>路径长度限制为1000</li>
+<li>路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</li>
+<li>文件名或路径名开头结尾不能是‘.’或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</li>
+<li>调用move接口时，目标文件的名称如果和源文件不相同，将会在move操作时对文件进行重命名。</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>POST https://pcs.baidu.com/rest/2.0/pcs/file?method=move&amp;from=%2fapps%2f pcstest_oauth%2f test1%2fyyyytestwer.jpg&amp;to=%2fapps%2fpcstest_oauth%2ftest2%2f2.jpg&amp;access_token=b778fb598c717c0ad7ea8c97c8f3a46f</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;extra&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;list&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s">&quot;to&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/pcstest_oauth/test2/2.jpg&quot;</span><span class="p">,</span>
+                <span class="s">&quot;from&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/pcstest_oauth/test1/yyyytestwer.jpg&quot;</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">},</span>
+    <span class="s">&quot;request_id&quot;</span><span class="p">:</span> <span class="mi">2298812844</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">mv</span><span class="p">(</span><span class="s">&quot;/apps/appname/hello.txt&quot;</span><span class="p">,</span> <span class="s">&quot;/apps/appname/hello.txt.bak&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id11">
+<h2>批量移动文件/目录<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>批量移动文件/目录。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>POST</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/file">https://pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值，move。</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+<li>param   string  是  源文件地址和目标文件地址对应的列表。 {&#8220;list&#8221;:[{&#8220;from&#8221;:&#8221;/apps/album/a/b/c&#8221;,&#8221;to&#8221;:&#8221;/apps/album/b/b/c&#8221;},{&#8220;from&#8221;:&#8221;/apps/album/a/b/d&#8221;,&#8221;to&#8221;:&#8221;/apps/album/b/b/d&#8221;}]}</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    UrlEncode    描述</li>
+<li>from    string  是  执行move操作成功的源文件地址。</li>
+<li>to  string  是  执行move操作成功的目标文件地址。</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>路径长度限制为1000</li>
+<li>路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</li>
+<li>文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</li>
+<li>执行批量move操作时，param参数通过HTTP Body进行传递；</li>
+<li>批量执行move操作时，move接口一次对请求参数：中的每个from/to进行操作；</li>
+<li>执行失败就会退出，成功就继续，返回执行成功的from/to列表。</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>POST https://pcs.baidu.com/rest/2.0/pcs/file?method=move&amp;access_token=b778fb500c717c0ad7ea8c97c8f3a46f</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;extra&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;list&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s">&quot;to&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/pcstest_oauth/test2/2.jpg&quot;</span><span class="p">,</span>
+                <span class="s">&quot;from&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/pcstest_oauth/test1/yyyytestwer.jpg&quot;</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">},</span>
+    <span class="s">&quot;request_id&quot;</span><span class="p">:</span> <span class="mi">2298812844</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="n">param</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;list&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s">&quot;from&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/appname/hello.txt.bak&quot;</span><span class="p">,</span>
+                   <span class="s">&quot;to&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/appname/hello.txt.bak.bak&quot;</span><span class="p">},</span>
+                  <span class="p">{</span><span class="s">&quot;from&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/appname/dirs&quot;</span><span class="p">,</span>
+                   <span class="s">&quot;to&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/appname/dirsbak&quot;</span><span class="p">}]}</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">mmv</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">param</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id12">
+<h2>拷贝单个文件/目录<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>拷贝文件(目录)。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>POST</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/file">https://pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值，copy。</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+<li>from    string  是  源文件地址。</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    UrlEncode    描述</li>
+<li>from    string  是  执行copy操作成功的源文件地址。</li>
+<li>to  string  是  执行copy操作成功的目标文件地址。</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>路径长度限制为1000</li>
+<li>路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</li>
+<li>文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</li>
+<li>move操作后，源文件被移动至目标地址；copy操作则会保留原文件。</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>POST https://pcs.baidu.com/rest/2.0/pcs/file?method=copy&amp;from=%2fapps%2fpcstest_oauth%2f test1%2f6.jpg&amp;to=%2fapps%2fpcstest_oauth%2ftest2%2f6.jpg&amp;access_token=b700fb598c717c0ad7ea8c97c8f3a46f</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;extra&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;list&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s">&quot;to&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/pcstest_oauth/test2/6.jpg&quot;</span><span class="p">,</span>
+                <span class="s">&quot;from&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/pcstest_oauth/test1/6.jpg&quot;</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">},</span>
+    <span class="s">&quot;request_id&quot;</span><span class="p">:</span> <span class="mi">2298812844</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">cp</span><span class="p">(</span><span class="s">&quot;/apps/appname/hello.txt&quot;</span><span class="p">,</span> <span class="s">&quot;/apps/appname/world.txt&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id13">
+<h2>批量拷贝文件/目录<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>拷贝文件(目录)。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>POST</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/file">https://pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值，copy。</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+<li>param   string  是  源文件地址和目标文件地址对的列表。 {&#8220;list&#8221;:[{&#8220;from&#8221;:&#8221;/apps/album/a/b/c&#8221;,&#8221;to&#8221;:&#8221;/apps/album/b/b/c&#8221;},{&#8220;from&#8221;:&#8221;/apps/album/a/b/d&#8221;,&#8221;to&#8221;:&#8221;/apps/album/b/b/d&#8221;}]}</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    UrlEncode   描述</li>
+<li>from    string  是  执行copy操作成功的源文件地址。</li>
+<li>to  string  是  执行copy操作成功的目标文件地址。</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>路径长度限制为1000</li>
+<li>路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</li>
+<li>文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</li>
+<li>执行批量copy操作时，param参数通过HTTP Body传递；</li>
+<li>批量执行copy操作时，copy接口一次对请求参数：中的每个from/to进行操作；执行失败就会退出，成功就继续，返回执行成功的from/to列表。</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>POST https://pcs.baidu.com/rest/2.0/pcs/file?method=copy&amp;access_token=b778fb008c717c0ad7ea8c97c8f3a46f</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;extra&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;list&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s">&quot;to&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/pcstest_oauth/test1/6.jpg&quot;</span><span class="p">,</span>
+                <span class="s">&quot;from&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/pcstest_oauth/test2/6.jpg&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s">&quot;to&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/pcstest_oauth/test2/89.jpg&quot;</span><span class="p">,</span>
+                <span class="s">&quot;from&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/pcstest_oauth/89.jpg&quot;</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">},</span>
+    <span class="s">&quot;request_id&quot;</span><span class="p">:</span> <span class="mi">2166619191</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="n">param</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;list&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s">&quot;from&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/appname/hello.txt.bak&quot;</span><span class="p">,</span>
+                   <span class="s">&quot;to&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/appname/hello.txt.bak.bak&quot;</span><span class="p">},</span>
+                  <span class="p">{</span><span class="s">&quot;from&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/appname/dirs&quot;</span><span class="p">,</span>
+                   <span class="s">&quot;to&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/appname/dirsbak&quot;</span><span class="p">}]}</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">mcp</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">par</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id14">
+<h2>删除单个文件/目录<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>删除单个文件/目录。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>POST</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/file">https://pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值，delete。</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+<li>path    string  是  需要删除的文件或者目录路径。如：/apps/album/a/b/c</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>文件/目录删除后默认临时存放在回收站内，删除文件或目录的临时存放不占用用户的空间配额；</li>
+<li>存放有效期为10天，10天内可还原回原路径下，10天后则永久删除。</li>
+<li>路径长度限制为1000</li>
+<li>路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</li>
+<li>文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>无</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>POST https://pcs.baidu.com/rest/2.0/pcs/file?method=delete&amp;access_token=1.54bef91002416ee4a41791d4a8ea04fe.86400.1331206383.67272939-188383&amp;path=%2Fapps%2Fyunform%2Fmusic</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;request_id&quot;</span><span class="p">:</span><span class="mi">4043312866</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">rm</span><span class="p">(</span><span class="s">&#39;/apps/appname/hello.txt.bak&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id15">
+<h2>批量删除文件/目录<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>批量删除文件/目录。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>POST</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/file">https://pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值，delete。</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+<li>param   string  是  需要删除的文件或者目录路径。如： {&#8220;list&#8221;:[{&#8220;path&#8221;:&#8221;/apps/album/a/b/c&#8221;},{&#8220;path&#8221;:&#8221;/apps/album/a/b/d&#8221;}]}</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>文件/目录删除后默认临时存放在回收站内，删除文件或目录的临时存放不占用用户的空间配额；</li>
+<li>存放有效期为10天，10天内可还原回原路径下，10天后则永久删除。</li>
+<li>路径长度限制为1000</li>
+<li>路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</li>
+<li>文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>无</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>POST https://pcs.baidu.com/rest/2.0/pcs/file?method=delete&amp;access_token=1.54bef91002416ee4a41791d400ea04fe.86400.1331206383.67272939-188383</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;request_id&quot;</span><span class="p">:</span><span class="mi">4043312865</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="n">par</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;list&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s">&quot;path&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/appname/hello.txt1&quot;</span><span class="p">},</span>
+                <span class="p">{</span><span class="s">&quot;path&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/appname/dirs&quot;</span><span class="p">}]}</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">mrm</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">par</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id16">
+<h2>搜索<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>按文件名搜索文件（不支持查找目录）。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>GET</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/file">https://pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值，search。</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+<li>path    string  是  需要检索的目录。</li>
+<li>wd  string  是  关键词。</li>
+<li>re  string  否  是否递归。“0”表示不递归 “1”表示递归 缺省为“0”</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>路径长度限制为1000</li>
+<li>路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</li>
+<li>文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    UrlEncode    描述</li>
+<li>fs_id   uint64  否  目录在PCS的临时唯一标识ID。</li>
+<li>path    string  否  该目录的绝对路径。</li>
+<li>ctime   uint    否  文件服务器创建时间。</li>
+<li>mtime   uint    否  文件服务器修改时间。</li>
+<li>md5 string  否  文件的md5值。</li>
+<li>size    uint    否  文件大小（byte）。</li>
+<li>isdir   uint    否  是否是目录的标识符： 0为文件 1为目录</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>GET https://pcs.baidu.com/rest/2.0/pcs/file?method=search&amp;access_token=1.54bee00df241eee4a41791d4a8ea04fe.86400.1331206383.67272939-188383&amp;path=%2Fapps%2Fyunform%2Fmusic&amp;wd=hello&amp;re=1</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;list&quot;</span><span class="p">:[{</span><span class="s">&quot;fs_id&quot;</span><span class="p">:</span><span class="mi">3528850315</span><span class="p">,</span>
+        <span class="s">&quot;path&quot;</span><span class="p">:</span><span class="s">&quot;/apps/yunform/music/hello&quot;</span><span class="p">,</span>
+        <span class="s">&quot;ctime&quot;</span><span class="p">:</span><span class="mi">1331184269</span><span class="p">,</span>
+        <span class="s">&quot;mtime&quot;</span><span class="p">:</span><span class="mi">1331184269</span><span class="p">,</span>
+        <span class="s">&quot;block_list&quot;</span><span class="p">:[</span><span class="s">&quot;59ca0efa9f5633cb0371bbc0355478d8&quot;</span><span class="p">],</span>
+        <span class="s">&quot;size&quot;</span><span class="p">:</span><span class="mi">13</span><span class="p">,</span>
+        <span class="s">&quot;isdir&quot;</span><span class="p">:</span><span class="mi">0</span>
+    <span class="p">}],</span>
+        <span class="s">&quot;request_id&quot;</span><span class="p">:</span><span class="mi">4043312670</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">grep</span><span class="p">(</span><span class="s">&#39;hello&#39;</span><span class="p">,</span> <span class="s">&#39;/apps/appname/&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;hello&#39;</span><span class="p">,</span> <span class="s">&#39;/apps/appname/&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id17">
+<h2>缩略图<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>获取指定图片文件的缩略图。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>GET</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/thumbnail">https://pcs.baidu.com/rest/2.0/pcs/thumbnail</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值，generate。</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+<li>path    string  是  源图片的路径。</li>
+<li>quality int32   否  缩略图的质量，默认为“100”，取值范围(0,100]。</li>
+<li>height  int 是  指定缩略图的高度，取值范围为(0,1600]。</li>
+<li>width   int 是  指定缩略图的宽度，取值范围为(0,1600]。</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>路径长度限制为1000</li>
+<li>路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</li>
+<li>文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</li>
+<li>原图大小(0, 10M]；</li>
+<li>原图类型: jpg、jpeg、bmp、gif、png；</li>
+<li>目标图类型:和原图的类型有关；例如：原图是gif图片，则缩略后也为gif图片。</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>无</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>GET https://pcs.baidu.com/rest/2.0/pcs/thumbnail?method=generate&amp;path=%2Fapps%2Fpcstest_oauth%2FSunset.jpg&amp;quality=100&amp;width=1600&amp;height=1600</pre>
+</div>
+<dl class="docutils">
+<dt>响应示例：</dt>
+<dd><ul class="first last simple">
+<li>缩略图文件内容</li>
+</ul>
+</dd>
+</dl>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">thumb</span><span class="p">(</span><span class="s">&#39;/apps/appname/1.png&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id18">
+<h2>增量更新查询<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>文件增量更新操作查询接口。本接口有数秒延迟，但保证返回结果为最终一致。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>GET</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/file">https://pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+<li>method  string  是  固定值，diff。</li>
+<li>cursor  string  是  用于标记更新断点。 首次调用cursor=null； 非首次调用，使用最后一次调用diff接口的返回结果中的cursor。</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last">
+<li><p class="first">参数名称    类型    描述</p>
+</li>
+<li><dl class="first docutils">
+<dt>entries array   k-v形式的列表，分为以下两种形式：</dt>
+<dd><ol class="first arabic simple">
+<li>key为path，value为path对应的meta值，meta中isdelete=0为更新操作</li>
+</ol>
+<p>如果path为文件，则更新path对应的文件；
+如果path为目录，则更新path对应的目录信息，但不更新path下的文件。
+2. key为path，value为path删除的meta信息，meta中“isdelete!=0”为删除操作。</p>
+<p class="last">isdelete=1 该文件被永久删除；
+isdelete=-1 该文件被放置进回收站；
+如果path为文件，则删除该path对应的文件；
+如果path为目录，则删除该path对应的目录和目录下的所有子目录和文件；
+如果path在本地没有任何记录，则跳过本删除操作。
+has_more    boolean
+True： 本次调用diff接口，增量更新结果服务器端无法一次性返回，客户端可以立刻再调用一次diff接口获取剩余结果；
+False： 截止当前的增量更新结果已经全部返回，客户端可以等待一段时间（1-2分钟）之后再diff一次查看是否有更新。
+reset   boolean
+True： 服务器通知客户端，服务器端将按时间排序从第一条开始向客户端返回一份完整的数据列表；
+False：返回上次请求返回cursor之后的增量更新结果。
+cursor  string  用于下一次调用diff接口时传入的断点参数。</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>GET https://pcs.baidu.com/rest/2.0/pcs/file?method=diff&amp;access_token=1.54bef91df2416ee4a41791d4a8ea04fe.86400.1331206383.67272939-188383&amp;cursor=null
+GET https://pcs.baidu.com/rest/2.0/pcs/file?method=diff&amp;access_token=1.54bef91df2416ee4a41791d4a8ea04fe.86400.1331206383.67272939-188383&amp;cursor=MxKx6UPi3w2Jt%2B%2BktMKKQpBbnC%2B11aH7Ec9pt%2BfteS%2F%2BknWrp3JIz%2F6fXHccEkZo2kkkSH748hScdRgcA4VCZJuCMQMvNkXAlSmzT5TwqBVc3xwhSxaFkClqbcogAOc8I0k7xtTb9nG6rBJsxNgRFgBV4F695TkrLDHYHRy%2BQ%3D%3D</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;entries&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">&quot;/baiduapp/browser&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">&quot;fs_id&quot;</span><span class="p">:</span> <span class="mi">2427025269</span><span class="p">,</span>
+                <span class="s">&quot;path&quot;</span><span class="p">:</span> <span class="s">&quot;/baiduapp/browser&quot;</span><span class="p">,</span>
+                <span class="s">&quot;size&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s">&quot;isdir&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s">&quot;md5&quot;</span><span class="p">:</span> <span class="s">&quot;&quot;</span><span class="p">,</span>
+                <span class="s">&quot;mtime&quot;</span><span class="p">:</span> <span class="mi">1336631762</span><span class="p">,</span>
+                <span class="s">&quot;ctime&quot;</span><span class="p">:</span> <span class="mi">1336631762</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+        <span class="s">&quot;has_more&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+        <span class="s">&quot;reset&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+        <span class="s">&quot;cursor&quot;</span><span class="p">:</span> <span class="s">&quot;MxKx6UPie</span><span class="si">%2F</span><span class="s">9WzBkwALPrVWQlyxlmK0LgHG8zutwXp8oyC</span><span class="si">%2F</span><span class="s">ngIdGgS3w2Jt%2B%2BktMKKQpBbnC%2B11aH7Ec9pt%2BfteS</span><span class="si">%2F</span><span class="s">%2BknWrp3JIz</span><span class="si">%2F</span><span class="s">6fXHccEkZo2kkkSH748hScdRgcA4VCZJuCMQMvNkXAlSmzT5TwqBVc3xwhSxaFkClqbcogAOc8I0k7xtTb9nG6rBJsxNgRFgBV4F695TkrLDHYHRy%2BQ%3D%3D&quot;</span><span class="p">,</span>
+        <span class="s">&quot;request_id&quot;</span><span class="p">:</span> <span class="mi">3355443548</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id19">
+<h2>视频转码<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>对视频文件进行转码，实现实时观看视频功能：。 可下载支持HLS/M3U8的媒体云播放器SDK配合使用。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>GET</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/file">https://pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值为streaming。</li>
+<li>access_token    string  是  开发者准入token，https调用时必须使用。</li>
+<li>path    string  是  需要下载的视频文件路径，以/开头的绝对路径，需含源文件的文件名。</li>
+<li>type    string  是  目前支持以下格式：</li>
+<li>M3U8_320_240、M3U8_480_224、M3U8_480_360、M3U8_640_480和M3U8_854_480</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>路径长度限制为1000</li>
+<li>路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</li>
+<li>文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</li>
+</ul>
+</dd>
+<dt>支持格式：</dt>
+<dd><ul class="first last simple">
+<li>格式名称    扩展名  备注</li>
+<li>Apple HTTP Live Streaming   m3u8/m3u    iOS支持的视频格式</li>
+<li>ASF asf 视频格式</li>
+<li>AVI avi 视频格式</li>
+<li>Flash Video (FLV)   flv Macromedia Flash视频格式</li>
+<li>GIF Animation   gif 视频格式</li>
+<li>Matroska    mkv Matroska/WebM视频格式</li>
+<li>MOV/QuickTime/MP4   mov/mp4/m4a/3gp/3g2/mj2 支持3GP、3GP2、PSP、iPod 之类视频格式</li>
+<li>MPEG-PS (program stream)    mpeg    也就是VOB文件、SVCD DVD格式</li>
+<li>MPEG-TS (transport stream)  ts  即DVB传输流</li>
+<li>RealMedia   rm/rmvb Real视频格式</li>
+<li>WebM    webm    Html视频格式</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>无</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>GET https://pcs.baidu.com/rest/2.0/pcs/file?method=streaming&amp;path=%2fapps%2fvideo%2fv1.mov&amp;access_token=b778fb000c717c0ad7ea8c97c8f3a46f&amp;type=MP4_480P</pre>
+</div>
+<dl class="docutils">
+<dt>响应示例：</dt>
+<dd><ul class="first last simple">
+<li>直接返回文件内容</li>
+</ul>
+</dd>
+</dl>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">streaming</span><span class="p">(</span><span class="s">&#39;/apps/appname/1.mkv&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id20">
+<h2>获取流式文件列表<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>以视频、音频、图片及文档四种类型的视图获取所创建应用程序下的文件列表。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>GET</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/stream">https://pcs.baidu.com/rest/2.0/pcs/stream</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需 描述</li>
+<li>method  string  是  固定值为list。</li>
+<li>access_token    string  是  开发者准入token，HTTPS调用时必须使用。</li>
+<li>type    string  是  类型分为video、audio、image及doc四种。</li>
+<li>start   string  否  返回条目控制起始值，缺省值为0。</li>
+<li>limit   string  否  返回条目控制长度，缺省为1000，可配置。</li>
+<li>filter_path string  否  需要过滤的前缀路径，如：/apps/album</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>路径长度限制为1000</li>
+<li>路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</li>
+<li>文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    描述</li>
+<li>total   uint    文件总数。</li>
+<li>start   uint    起始数。</li>
+<li>limit   uint    获取数。</li>
+<li>path    string  获取流式文件的绝对路径。</li>
+<li>block_list  string  分片MD5列表。</li>
+<li>size    uint    流式文件的文件大小（byte）。</li>
+<li>mtime   uint    流式文件在服务器上的修改时间 。</li>
+<li>ctime   uint    流式文件在服务器上的创建时间 。</li>
+<li>fs_id   uint64  流式文件在PCS中的唯一标识ID 。</li>
+<li>isdir   uint    0：文件 1：目录</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>GET https://pcs.baidu.com/rest/2.0/pcs/stream?method=list&amp;type=image&amp;start=50&amp;limit=100&amp;access_token=b778fb000c717c0ad7ea8c97c8f3a46f</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;total&quot;</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span>
+        <span class="s">&quot;start&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s">&quot;limit&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s">&quot;list&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s">&quot;path&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/album/1.jpg&quot;</span><span class="p">,</span>
+            <span class="s">&quot;size&quot;</span><span class="p">:</span> <span class="mi">372121</span><span class="p">,</span>
+            <span class="s">&quot;ctime&quot;</span><span class="p">:</span> <span class="mi">1234567890</span><span class="p">,</span>
+            <span class="s">&quot;mtime&quot;</span><span class="p">:</span> <span class="mi">1234567890</span><span class="p">,</span>
+            <span class="s">&quot;md5&quot;</span><span class="p">:</span> <span class="s">&quot;cb123afcc12453543ef&quot;</span><span class="p">,</span>
+            <span class="s">&quot;fs_id&quot;</span><span class="p">:</span> <span class="mi">12345</span><span class="p">,</span>
+            <span class="s">&quot;isdir&quot;</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s">&#39;doc&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id21">
+<h2>下载流式文件<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>为当前用户下载一个流式文件。其参数和返回结果与下载单个文件的相同。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>GET</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://d.pcs.baidu.com/rest/2.0/pcs/file">https://d.pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需 描述</li>
+<li>method  string  是  固定值为download。</li>
+<li>access_token    string  是  开发者准入token，HTTPS调用时必须使用。</li>
+<li>path    string  是  需要下载的文件路径，以/开头的绝对路径，含文件名。</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>兼容原有域名pcs.baidu.com；使用新域名d.pcs.baidu.com，则提供更快、更稳定的下载服务。</li>
+<li>需注意处理好 302 跳转问题。</li>
+<li>路径长度限制为1000</li>
+<li>路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</li>
+<li>文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>无</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>GET https://pcs.baidu.com/rest/2.0/pcs/stream?method=download&amp;access_token=b778fb000c717c0ad7ea8c97c8f3a46f&amp;path=%2fapps%2falbum%2f1.jpg</pre>
+</div>
+<dl class="docutils">
+<dt>响应示例：</dt>
+<dd><ul class="first last simple">
+<li>流式文件内容</li>
+</ul>
+</dd>
+</dl>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">downstream</span><span class="p">(</span><span class="s">&#39;/apps/appname/1.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id22">
+<h2>秒传文件<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>秒传一个文件。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>POST</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/file">https://pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需 描述</li>
+<li>method  string  是  固定值为rapidupload。</li>
+<li>access_token    string  是  开发者准入token，HTTPS调用时必须使用。</li>
+<li>path    string  是  上传文件的全路径名。</li>
+<li>content-length  int 是  待秒传的文件长度。</li>
+<li>content-md5 string  是  待秒传的文件的MD5。</li>
+<li>slice-md5   string  是  待秒传文件校验段的MD5。</li>
+<li>content-crc32   string  是  待秒传文件CRC32</li>
+<li>ondup   string  否</li>
+<li>overwrite：表示覆盖同名文件；</li>
+<li>newcopy：表示生成文件副本并进行重命名，命名规则为“文件名_日期.后缀”。</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    描述</li>
+<li>path    string  秒传文件的绝对路径。</li>
+<li>size    uint64  秒传文件的字节大小 。</li>
+<li>ctime   uint64  秒传文件的创建时间。</li>
+<li>mtime   uint64  秒传文件的修改时间 。</li>
+<li>md5 string  秒传文件的md5签名。</li>
+<li>fs_id   uint64  秒传文件在PCS的唯一标识ID。</li>
+<li>isdir   uint    0：文件 1：目录</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>被秒传文件必须大于256KB（即 256*1024 B）。</li>
+<li>校验段为文件的前256KB，秒传接口需要提供校验段的MD5。 (非强一致接口，上传后请等待1秒后再读取)</li>
+<li>路径长度限制为1000</li>
+<li>路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</li>
+<li>文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>POST https://pcs.baidu.com/rest/2.0/pcs/file?method=rapidupload&amp;access_token=b778fb000c717c0ad7ea8c97c8f3a46f&amp;content-length=1542719&amp;content-md5=3edf3d47292280e0182db6750bd176e5&amp;slice-md5=6fce289cfee3e4414788dcd000a3ddc4&amp;path=%2fa%2fb%2fc</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;path&quot;</span><span class="p">:</span> <span class="s">&quot;/apps/album/1.jpg&quot;</span><span class="p">,</span>
+    <span class="s">&quot;size&quot;</span><span class="p">:</span> <span class="mi">372121</span><span class="p">,</span>
+    <span class="s">&quot;ctime&quot;</span><span class="p">:</span> <span class="mi">1234567890</span><span class="p">,</span>
+    <span class="s">&quot;mtime&quot;</span><span class="p">:</span> <span class="mi">1234567890</span><span class="p">,</span>
+    <span class="s">&quot;md5&quot;</span><span class="p">:</span> <span class="s">&quot;cb123afcc12453543ef&quot;</span><span class="p">,</span>
+    <span class="s">&quot;fs_id&quot;</span><span class="p">:</span> <span class="mi">12345</span><span class="p">,</span>
+    <span class="s">&quot;isdir&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;request_id&quot;</span><span class="p">:</span> <span class="mi">12314124</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">rapidsend</span><span class="p">(</span><span class="s">&#39;/home/solos/file&#39;</span><span class="p">,</span>
+                     <span class="n">content_length</span><span class="p">,</span>
+                     <span class="n">content_md5</span><span class="p">,</span> <span class="n">slice_md5</span><span class="p">,</span> <span class="n">content_crc32</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id23">
+<h2>添加离线下载任务<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>添加离线下载任务，实现单个文件离线下载。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>POST</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/services/cloud_dl">https://pcs.baidu.com/rest/2.0/pcs/services/cloud_dl</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需 描述</li>
+<li>method  string  是  固定值为add_task。</li>
+<li>access_token    string  是  开发者准入token，HTTPS调用时必须使用。</li>
+<li>expires int 否  请求失效时间，如果有，则会校验。</li>
+<li>save_path   string  是  下载后的文件保存路径。</li>
+<li>source_url  string  是  源文件的URL。</li>
+<li>rate_limit  int 否  下载限速，默认不限速。</li>
+<li>timeout int 否  下载超时时间，默认3600秒。</li>
+<li>callback    string  否  下载完毕后的回调，默认为空。</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>路径长度限制为1000</li>
+<li>路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</li>
+<li>文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>任务ID号</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>POST https://pcs.baidu.com/rest/2.0/pcs/service/cloud_dl?method=add_task&amp;access_token=40001fsdjfdjskaf&amp;source_url=http:\/\/dl_dir.qq.com:80\/qqfile\/qq\/QQ2012\/QQ2012.exe</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><pre>* 任务ID号成功：
+
+{
+    "task_id": 432432432432432,
+    "request_id": 3372220525
+}
+
+* 任务并发太大：
+
+{
+    "error_code": 36013,
+    "error_msg": "too many tasks",
+    "request_id": 3372220539
+}</pre>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="s">&#39;http://www.baidu.com&#39;</span><span class="p">,</span> <span class="s">&#39;/apps/appname/1.html&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id24">
+<h2>精确查询离线下载任务<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>根据任务ID号，查询离线下载任务信息及进度信息。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>POST</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/service/cloud_dl">https://pcs.baidu.com/rest/2.0/pcs/service/cloud_dl</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值为query_task。</li>
+<li>access_token    string  是  开发者准入token，HTTPS调用时必须使用。</li>
+<li>expires int 否  请求失效时间，如果有，则会校验。</li>
+<li>task_ids    string  是  要查询的任务ID信息，如：1,2,3,4</li>
+<li>op_type int 是  0：查任务信息 1：查进度信息，默认为1</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>无</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>POST https://pcs.baidu.com/rest/2.0/pcs/services/cloud_dl?method=query_task&amp;access_token=43000fsdjfdjskaf</pre>
+</div>
+<p>返回示例：:</p>
+<div class="highlight-python"><pre>* 查询任务信息：
+
+{
+    "request_id": 12394838223,
+        "task_info": {
+            "123456": {
+                "result": 0,
+                "source_url": "http://www.example.com/xxx.zip",
+                "save_path": "http://xxxx/",
+                "rate_limit": 10,
+                "timeout": 3600,
+                "callback": "http://XXX",
+                "status": 1,
+                "create_time": "UNIX_TIMESTAMP"
+            },
+            "43829483": {
+                "result": 1
+            }
+        }
+}
+
+* 查询进度信息：
+
+{
+    "request_id": 12394838223,
+        "task_info": {
+            "123456": {
+                "result": 0,
+                "status": 0,
+                "file_size": 1024,
+                "finished_size": 512,
+                "create_time": 123232132,
+                "start_time": 43728943,
+                "finish_time": 43728948
+            },
+            "43829483": {
+                "result": 1
+            }
+        }
+}</pre>
+</div>
+<dl class="docutils">
+<dt>响应示例：</dt>
+<dd><ul class="first last simple">
+<li>任务信息或进度信息</li>
+</ul>
+</dd>
+</dl>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">query_task</span><span class="p">(</span><span class="s">&#39;3665778&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id25">
+<h2>查询离线下载任务列表<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>查询离线下载任务ID列表及任务信息。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>POST</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/services/cloud_dl">https://pcs.baidu.com/rest/2.0/pcs/services/cloud_dl</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需 描述</li>
+<li>method  string  是  固定值为list_task。</li>
+<li>access_token    string  是  开发者准入token，HTTPS调用时必须使用。</li>
+<li>expires int 否  请求失效时间，如果有，则会校验。</li>
+<li>start   int 否  查询任务起始位置，默认为0。</li>
+<li>limit   int 否  设定返回任务数量，默认为10。</li>
+<li>asc int 否  0：降序，默认值 1：升序</li>
+<li>source_url  string  否  源地址URL，默认为空。</li>
+<li>save_path   string  否  文件保存路径，默认为空。</li>
+<li>create_time int 否  任务创建时间，默认为空。</li>
+<li>status  int 否  任务状态，默认为空。</li>
+<li>need_task_info  int 否  是否需要返回任务信息: 0：不需要 1：需要，默认为1</li>
+</ul>
+</dd>
+<dt>注意：</dt>
+<dd><ul class="first last simple">
+<li>路径长度限制为1000</li>
+<li>路径中不能包含以下字符：\ ? | &#8221; &gt; &lt; : *</li>
+<li>文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: r, n, t, 空格, 0, x0B</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>任务信息或任务列表</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>* 查询离线下载任务ID列表
+POST https://pcs.baidu.com/rest/2.0/pcs/services/cloud_dl?method=list_task&amp;access_token=43000fsdjfdjskaf&amp;need_task_info=1</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><pre>* 任务列表
+
+{
+    task_info: [
+        {
+            task_id: "26"
+        }
+    ],
+    total: "1",
+    request_id: 1283164486
+}
+
+* 任务信息
+
+{
+    "task_info": [
+        {
+            "task_id": "26",
+            "source_url": "http://dl_dir.qq.com:80/qqfile/qq/QQ2012/QQ2012.exe",
+            "save_path": "/apps/Slideshow/wu_jing_test0",
+            "rate_limit": "100",
+            "timeout": "10000",
+            "callback": "http://www.baidu.com",
+            "status": "1",
+            "create_time": "1347449048"
+        }
+    ],
+    "total": "1",
+    "request_id": 1285732167
+}</pre>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">list_task</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id26">
+<h2>取消离线下载任务<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>取消离线下载任务。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>POST</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/services/cloud_dl">https://pcs.baidu.com/rest/2.0/pcs/services/cloud_dl</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需 描述</li>
+<li>method  string  是  固定值为cancel_task。</li>
+<li>access_token    string  是  开发者准入token，HTTPS调用时必须使用。</li>
+<li>expires int 否  请求失效时间，如果有，则会校验。</li>
+<li>task_id string  是  要取消的任务ID号。</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>任务信息或任务列表</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>POST https://pcs.baidu.com/rest/2.0/pcs/services/cloud_dl?method=cancel_task&amp;access_token=43000fsdjfdjskaf&amp;task_id=26</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+   <span class="s">&quot;request_id&quot;</span><span class="p">:</span> <span class="mi">12394838223</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">cancel_task</span><span class="p">(</span><span class="s">&#39;3665778&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id27">
+<h2>查询回收站文件<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>获取回收站中的文件及目录列表。</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>GET</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/file">https://pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值为listrecycle</li>
+<li>start   int 否  返回条目的起始值，缺省值为0</li>
+<li>limit   int 否  返回条目的长度，缺省值为1000</li>
+<li>access_token    string  是  开发者准入token，HTTPS调用时必须使用。</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    urlEncode   描述</li>
+<li>fs_id   uint64  否  目录在PCS上的临时唯一标识</li>
+<li>path    string  是  该目录的绝对路径</li>
+<li>ctime   uint    否  文件在服务器上的创建时间</li>
+<li>mtime   uint    否  文件在服务器上的修改时间</li>
+<li>md5 string  否  分片MD5</li>
+<li>size    uint    否  文件大小（byte）</li>
+<li>isdir   uint    否  是否是目录的标识符： “0”为文件 “1”为目录</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>GET https://pcs.baidu.com/rest/2.0/pcs/file?method=listrecycle&amp;start=50&amp;limit=100&amp;access_token=111f1118c717111a8111c8f3a46f</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><pre>* 获取成功
+
+{
+    "list": [
+    {
+        "isdir": 0,
+            "ctime": 1361934614,
+            "fs_id": 1579174,
+            "mtime": 1361934625,
+            "path": "/apps/CloudDriveDemo/testfile-10.rar",
+            "md5": "1131170ac11cfbec411a5e8d4e111769",
+            "size": 10730431
+    },
+    {
+        "isdir": 0,
+        "ctime": 1361934605,
+        "fs_id": 304521061,
+        "mtime": 1361934625,
+        "path": "/apps/CloudDriveDemo/testfile-4.rar",
+        "md5": "9552bf5e5abdf962e2de94be243bec7c",
+        "size": 4287611
+    }
+    ],
+        "request_id": 3779302504
+}
+
+
+* 获取失败
+
+{
+    "error_code": 110,
+    "error_msg": "Access token invalid or no longer valid",
+    "request_id": 1444638699
+}</pre>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">listrecycle</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id28">
+<h2>还原单个文件或目录<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>还原单个文件或目录（非强一致接口，调用后请sleep 1秒读取）</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>POST</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/file">https://pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值为restore。</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+<li>fs_id   string  是  所还原的文件或目录在PCS的临时唯一标识ID。</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    描述</li>
+<li>extra   extra由list数组组成，list数组中包含一个元素fs_id，即文件或目录在PCS的临时唯一标识ID。</li>
+<li>request_id  请求ID，也就是服务器用于追踪错误的的日志ID</li>
+<li>还原失败，则返回错误信息</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>POST https://pcs.baidu.com/rest/2.0/pcs/file?method=restore&amp;fs_id=123456&amp;access_token=111f1118c717111a8111c8f3a46f</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><pre>* 还原成功
+
+{
+    "extra": {
+        "list": [
+        {
+            "fs_id": "1356099017"
+        }
+        ]
+    },
+        "request_id": 3775323016
+}
+
+* 还原失败
+
+{
+    "error_code": 31061,
+        "error_msg": "file already exists",
+        "request_id": 811204199
+}</pre>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="s">&#39;4045501009&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id29">
+<h2>批量还原文件或目录<a class="headerlink" href="#id29" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>批量还原文件或目录（非强一致接口，调用后请sleep1秒 ）</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>POST</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/file">https://pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值为restore。</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用。</li>
+<li>param   string  是  Body中的JSON串，用于批量处理</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    描述</li>
+<li>error_code  错误码，详见“文件API错误码列表”</li>
+<li>error_msg   错误信息，详见“文件API错误码列表”</li>
+<li>extra   extra由list数组组成，list数组中包含一个元素fs_id，即文件或目录ID</li>
+<li>request_id  请求ID，也就是服务器用于追踪错误的的日志ID</li>
+</ul>
+</dd>
+<dt>说明：</dt>
+<dd><ul class="first last simple">
+<li>全部还原成功的情况下，返回extra及request_id信息；</li>
+<li>还原多个文件或目录时，如果还原某个文件或目录失败，则报错并终止还原操作，返回error_code、error_msg、extra及request_id信息；</li>
+<li>其中，如果未成功还原任何文件时，返回的extra中的list数组为空；</li>
+<li>部分文件或目录还原成功时，则返回的extra中list数组中显示该部分文件的fs_id。</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>POST  https://pcs.baidu.com/rest/2.0/pcs/file?method=restore&amp;access_token=111f1118c717111a8111c8f3a46f.2592000.1364548100.3123371436-248414&amp;param={"list":[{"fs_id":"4059450057"},{"fs_id":"2959141864"}]}</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><pre>* 全部还原成功
+
+{
+    "extra": {
+        "list": [
+            {
+                "fs_id": "2959141864"
+            }
+        ]
+    },
+    "request_id": 1359873129
+}
+
+* 全部还原失败
+
+{
+    "error_code": 31061,
+        "error_msg": "file already exists",
+        "extra": {
+            "list": [ ]
+        },
+        "request_id": 1342759216
+}
+
+* 部分还原成功
+
+{
+    error_code: 31061,
+    error_msg: "file already exists",
+    extra: {
+        list: [
+            {
+                fs_id: "2959141864"
+            }
+        ]
+    },
+    request_id: 1359873129
+}</pre>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="n">param</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;list&quot;</span><span class="p">:[{</span><span class="s">&quot;fs_id&quot;</span><span class="p">:</span><span class="mi">2263172857</span><span class="p">},{</span><span class="s">&quot;fs_id&quot;</span><span class="p">:</span><span class="mi">4045501009</span><span class="p">}]}</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">mrestore</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">param</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id30">
+<h2>清空回收站<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>功能：</dt>
+<dd><ul class="first last simple">
+<li>清空回收站</li>
+</ul>
+</dd>
+<dt>HTTP请求方式：</dt>
+<dd><ul class="first last simple">
+<li>POST</li>
+</ul>
+</dd>
+<dt>请求地址：</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://pcs.baidu.com/rest/2.0/pcs/file">https://pcs.baidu.com/rest/2.0/pcs/file</a></li>
+</ul>
+</dd>
+<dt>请求参数：</dt>
+<dd><ul class="first last simple">
+<li>参数名称    类型    是否必需    描述</li>
+<li>method  string  是  固定值为delete</li>
+<li>type    string  是  固定值为recycle</li>
+<li>access_token    string  是  开发者准入标识，HTTPS调用时必须使用</li>
+</ul>
+</dd>
+<dt>返回参数：</dt>
+<dd><ul class="first last simple">
+<li>清空成功，返回请求ID</li>
+<li>清空失败，则返回错误信息</li>
+</ul>
+</dd>
+</dl>
+<p>请求示例：:</p>
+<div class="highlight-python"><pre>POST https://pcs.baidu.com/rest/2.0/pcs/file?method=delete&amp;type=recycle&amp;access_token=111f1118c717111a8111c8f3a46f</pre>
+</div>
+<p>响应示例：</p>
+<div class="highlight-python"><pre>* 清空成功
+
+{
+    "request_id": 2307473052
+}
+
+* 清空失败
+
+{
+    "error_code":31070,
+    "error_msg":"file delete failed",
+    "request_id":12345678
+}</pre>
+</div>
+<p>代码示例：</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">disk</span> <span class="o">=</span> <span class="n">BaiduPan</span><span class="p">(</span><span class="n">access_token</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">disk</span><span class="o">.</span><span class="n">emptyrecycle</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to baidupan&#8217;s documentation!</a><ul>
+<li><a class="reference internal" href="#id1">空间配额信息</a></li>
+<li><a class="reference internal" href="#id2">上传单个文件</a></li>
+<li><a class="reference internal" href="#id3">分片上传—文件分片及上传</a></li>
+<li><a class="reference internal" href="#id4">分片上传—合并分片文件</a></li>
+<li><a class="reference internal" href="#id5">下载单个文件</a></li>
+<li><a class="reference internal" href="#id6">创建目录</a></li>
+<li><a class="reference internal" href="#id7">获取单个文件/目录的元信息</a></li>
+<li><a class="reference internal" href="#id8">批量获取文件/目录的元信息</a></li>
+<li><a class="reference internal" href="#id9">获取目录下的文件列表</a></li>
+<li><a class="reference internal" href="#id10">移动单个文件/目录</a></li>
+<li><a class="reference internal" href="#id11">批量移动文件/目录</a></li>
+<li><a class="reference internal" href="#id12">拷贝单个文件/目录</a></li>
+<li><a class="reference internal" href="#id13">批量拷贝文件/目录</a></li>
+<li><a class="reference internal" href="#id14">删除单个文件/目录</a></li>
+<li><a class="reference internal" href="#id15">批量删除文件/目录</a></li>
+<li><a class="reference internal" href="#id16">搜索</a></li>
+<li><a class="reference internal" href="#id17">缩略图</a></li>
+<li><a class="reference internal" href="#id18">增量更新查询</a></li>
+<li><a class="reference internal" href="#id19">视频转码</a></li>
+<li><a class="reference internal" href="#id20">获取流式文件列表</a></li>
+<li><a class="reference internal" href="#id21">下载流式文件</a></li>
+<li><a class="reference internal" href="#id22">秒传文件</a></li>
+<li><a class="reference internal" href="#id23">添加离线下载任务</a></li>
+<li><a class="reference internal" href="#id24">精确查询离线下载任务</a></li>
+<li><a class="reference internal" href="#id25">查询离线下载任务列表</a></li>
+<li><a class="reference internal" href="#id26">取消离线下载任务</a></li>
+<li><a class="reference internal" href="#id27">查询回收站文件</a></li>
+<li><a class="reference internal" href="#id28">还原单个文件或目录</a></li>
+<li><a class="reference internal" href="#id29">批量还原文件或目录</a></li>
+<li><a class="reference internal" href="#id30">清空回收站</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="#">baidupan 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, solos.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

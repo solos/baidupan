@@ -1,3 +1,0 @@
-include ChangeLog.txt LICENES.txt README.md requirements.txt
-recursive-include test *.py *.sh
-recursive-include docs *.md
