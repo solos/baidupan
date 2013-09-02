@@ -3,3 +3,7 @@
 ## 2013-09-01
 
 * First public version.
+
+## 2013-09-02
+
+* modify README.md and docs
