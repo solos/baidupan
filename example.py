@@ -2,7 +2,7 @@
 #coding=utf-8
 
 import json
-from baidupan import BaiduPan
+from baidupan.baidupan import BaiduPan
 
 if __name__ == '__main__':
     access_token = ''
