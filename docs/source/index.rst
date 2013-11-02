@@ -232,6 +232,9 @@ HTTP请求方式：
     disk = BaiduPan(access_token)
     print disk.download(path='/apps/appname/hello.txt')
 
+    print disk.download(path="/apps/appname/hello.txt',
+                        headers={"Range": "Range: bytes:1-100"})
+
 创建目录
 --------
 功能：
