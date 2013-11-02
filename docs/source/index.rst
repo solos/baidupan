@@ -37,6 +37,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.quota()
     
@@ -84,6 +85,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.upload('hello', path='/apps/appname/hello.txt')
 
@@ -119,6 +121,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.upload('hello', path='/apps/appname/hello.txt')
 
@@ -181,6 +184,7 @@ block_list数组，数组的取值为子文件内容的MD5；子文件至少两�
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     param = {"block_list": [
                 "d41d8cd98f00b204e9800998ecf8427e",
@@ -224,8 +228,12 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.download(path='/apps/appname/hello.txt')
+
+    print disk.download(path="/apps/appname/hello.txt',
+                        headers={"Range": "Range: bytes:1-100"})
 
 创建目录
 --------
@@ -268,6 +276,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.mkdir('/apps/appname/dirname')
 
@@ -325,6 +334,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.meta('/apps/appname/filename')
 
@@ -393,6 +403,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.mmeta(json.dumps({"list": [{"path": "/apps/appname/"}]}))
 
@@ -458,6 +469,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.ls("/apps/appname/")
 
@@ -506,6 +518,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.mv("/apps/appname/hello.txt", "/apps/appname/hello.txt.bak")
 
@@ -554,6 +567,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     param = {"list": [{"from": "/apps/appname/hello.txt.bak",
                        "to": "/apps/appname/hello.txt.bak.bak"},
@@ -605,6 +619,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.cp("/apps/appname/hello.txt", "/apps/appname/world.txt")
 
@@ -656,6 +671,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     param = {"list": [{"from": "/apps/appname/hello.txt.bak",
                        "to": "/apps/appname/hello.txt.bak.bak"},
@@ -699,6 +715,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.rm('/apps/appname/hello.txt.bak')
 
@@ -736,6 +753,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     par = {"list": [{"path": "/apps/appname/hello.txt1"},
                     {"path": "/apps/appname/dirs"}]}
@@ -790,6 +808,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.grep('hello', '/apps/appname/')
     print disk.search('hello', '/apps/appname/')
@@ -829,6 +848,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.thumb('/apps/appname/1.png', 100, 100)
 
@@ -894,6 +914,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.diff()
 
@@ -941,6 +962,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.streaming('/apps/appname/1.mkv')
 
@@ -1002,6 +1024,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.stream(type='doc')
 
@@ -1036,6 +1059,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.downstream('/apps/appname/1.png')
 
@@ -1094,6 +1118,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.rapidsend('/home/solos/file',
                          content_length,
@@ -1148,6 +1173,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.add_task('http://www.baidu.com', '/apps/appname/1.html')
 
@@ -1221,6 +1247,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.query_task('3665778', 1)
 
@@ -1294,6 +1321,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.list_task()
 
@@ -1327,6 +1355,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.cancel_task('3665778')
 
@@ -1397,6 +1426,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.listrecycle()
 
@@ -1448,6 +1478,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.restore('4045501009')
 
@@ -1524,6 +1555,7 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     param = {"list":[{"fs_id":2263172857},{"fs_id":4045501009}]}
     print disk.mrestore(json.dumps(param))
@@ -1567,5 +1599,6 @@ HTTP请求方式：
 
 代码示例： ::
 
+    from baidupan.baidupan import BaiduPan
     disk = BaiduPan(access_token)
     print disk.emptyrecycle()

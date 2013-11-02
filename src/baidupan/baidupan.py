@@ -9,6 +9,7 @@ class BaiduPan(object):
     method = ''
     params = {}
     payload = {}
+    headers = {}
     files = None
 
     def __init__(self, access_token=''):
@@ -18,6 +19,9 @@ class BaiduPan(object):
         if 'file' in kw:
             self.files = {'files': (kw['filename'], kw['file'])}
             del kw['file']
+        if 'headers' in kw:
+            self.headers = kw['headers']
+            del kw['headers']
         if 'from_path' in kw:
             kw['from'] = kw['from_path']
             del kw['from_path']
@@ -37,7 +41,8 @@ class BaiduPan(object):
         self.url = ''.join([self.base_url, self.urlpath])
         if self._method == 'GET':
             try:
-                r = requests.get(self.url, params=self.params)
+                r = requests.get(self.url, params=self.params,
+                                 headers=self.headers)
                 return r.content
             except Exception, e:
                 print e
@@ -47,7 +52,8 @@ class BaiduPan(object):
                 try:
                     r = requests.post(self.url,
                                       files=self.files,
-                                      params=self.params)
+                                      params=self.params,
+                                      headers=self.headers)
                     return r.content
                 except Exception, e:
                     print e
@@ -57,14 +63,16 @@ class BaiduPan(object):
                     try:
                         r = requests.post(self.url,
                                           data=self.payload,
-                                          params=self.params)
+                                          params=self.params,
+                                          headers=self.headers)
                         return r.content
                     except Exception, e:
                         print e
                         return None
                 else:
                     try:
-                        r = requests.post(self.url, params=self.params)
+                        r = requests.post(self.url, params=self.params,
+                                          headers=self.headers)
                         return r.content
                     except Exception, e:
                         print e

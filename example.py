@@ -23,6 +23,8 @@ if __name__ == '__main__':
     print disk.merge('/apps/appname/hello.txt', param=param)
     #download
     print disk.download(path='/apps/appname/hello.txt')
+    print disk.download(path='/apps/appname/hello.txt',
+                        headers={"Range": "Range: bytes:1-100"})
     #mkdir
     print disk.mkdir('/apps/appname/dirname')
     #meta
