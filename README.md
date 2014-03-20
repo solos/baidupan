@@ -2,7 +2,7 @@
 
 #关于
 
-baidupan是一个百度盘(http://pan.baidu.com)API的Python SDK.
+baidupan是一个百度盘 (http://pan.baidu.com) API的Python SDK.
 
 #使用方法
 
