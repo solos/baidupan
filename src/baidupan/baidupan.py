@@ -3,6 +3,8 @@
 
 import requests
 
+__version__ = '0.0.1'
+
 
 class BaiduPan(object):
     base_url = 'https://pcs.baidu.com/rest/2.0/pcs/'
